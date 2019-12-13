@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace BottleStopAPI.bottlestop
+namespace BottleStopAPI.BottleStop
 {
     public partial class Machine
     {
@@ -13,6 +13,7 @@ namespace BottleStopAPI.bottlestop
 
         public int MachineId { get; set; }
         public int? GpsCoordiantesId { get; set; }
+        public int? FilledAmount { get; set; }
         public string ModelName { get; set; }
 
         public virtual GpsCoordinates GpsCoordiantes { get; set; }

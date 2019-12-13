@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace BottleStopAPI.bottlestop
+namespace BottleStopAPI.BottleStop
 {
     public partial class Balance
     {
@@ -11,7 +11,7 @@ namespace BottleStopAPI.bottlestop
         }
 
         public int BalanceId { get; set; }
-        public float Balance1 { get; set; }
+        public float BalanceAmount { get; set; }
 
         public virtual ICollection<BalanceTransaction> BalanceTransaction { get; set; }
     }
