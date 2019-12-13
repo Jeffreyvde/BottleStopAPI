@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace BottleStopAPI.bottlestop
+namespace BottleStopAPI.BottleStop
 {
     public partial class Address
     {
@@ -11,7 +11,7 @@ namespace BottleStopAPI.bottlestop
         }
 
         public int AddressId { get; set; }
-        public int CountryId { get; set; }
+        public int? CountryId { get; set; }
         public string PostalCode { get; set; }
         public int HouseNumber { get; set; }
         public string Additional { get; set; }

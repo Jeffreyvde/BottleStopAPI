@@ -2,15 +2,15 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
 
-namespace BottleStopAPI.bottlestop
+namespace BottleStopAPI.BottleStop
 {
-    public partial class bottlestopContext : DbContext
+    public partial class BottleStopContext : DbContext
     {
-        public bottlestopContext()
+        public BottleStopContext()
         {
         }
 
-        public bottlestopContext(DbContextOptions<bottlestopContext> options)
+        public BottleStopContext(DbContextOptions<BottleStopContext> options)
             : base(options)
         {
         }
@@ -45,7 +45,7 @@ namespace BottleStopAPI.bottlestop
             if (!optionsBuilder.IsConfigured)
             {
 #warning To protect potentially sensitive information in your connection string, you should move it out of source code. See http://go.microsoft.com/fwlink/?LinkId=723263 for guidance on storing connection strings.
-                optionsBuilder.UseMySql("server=bottle-stop-database.mysql.database.azure.com;port=3306;user=BottleStopAdmin@bottle-stop-database;password=Rx4NK8x*nQc*;database=bottlestop", x => x.ServerVersion("8.0.15-mysql"));
+                optionsBuilder.UseMySql("server=bottle-stop-database.mysql.database.azure.com;port=3306;user=BottleStopAdmin@bottle-stop-database;password=Rx4NK8x*nQc*;database=BottleStop", x => x.ServerVersion("8.0.15-mysql"));
             }
         }
 
@@ -104,7 +104,6 @@ namespace BottleStopAPI.bottlestop
                 entity.HasOne(d => d.Country)
                     .WithMany(p => p.Address)
                     .HasForeignKey(d => d.CountryId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("address_country_id");
             });
 
@@ -159,7 +158,7 @@ namespace BottleStopAPI.bottlestop
                     .HasColumnName("balance_id")
                     .HasColumnType("int(11)");
 
-                entity.Property(e => e.Balance1).HasColumnName("balance");
+                entity.Property(e => e.BalanceAmount).HasColumnName("balance_amount");
             });
 
             modelBuilder.Entity<BalanceTransaction>(entity =>
@@ -474,6 +473,10 @@ namespace BottleStopAPI.bottlestop
 
                 entity.Property(e => e.MachineId)
                     .HasColumnName("machine_id")
+                    .HasColumnType("int(11)");
+
+                entity.Property(e => e.FilledAmount)
+                    .HasColumnName("filled_amount")
                     .HasColumnType("int(11)");
 
                 entity.Property(e => e.GpsCoordiantesId)
@@ -836,7 +839,6 @@ namespace BottleStopAPI.bottlestop
                     .HasCollation("utf8_general_ci");
 
                 entity.Property(e => e.Password)
-                    .IsRequired()
                     .HasColumnName("password")
                     .HasColumnType("varchar(128)")
                     .HasCharSet("utf8")
