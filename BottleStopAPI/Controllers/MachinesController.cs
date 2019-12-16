@@ -1,15 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using BottleStopAPI.BottleStop;
 
 namespace BottleStopAPI.Controllers
 {
-    [Route("api/[controller]")]
+    [Route(Constants.ControllersName.machinesController)]
     [ApiController]
     public class MachinesController : ControllerBase
     {
@@ -27,18 +25,20 @@ namespace BottleStopAPI.Controllers
             return await _context.Machine.ToListAsync();
         }
 
-        // GET: api/Machines/5
-        [HttpGet("{id}")]
-        public async Task<ActionResult<Machine>> GetMachine(string id)
+        /// <summary>
+        /// Get the availability for the machine
+        /// </summary>
+        /// <param name="id">the id for the machine</param>
+        /// <returns></returns>
+        // GET: machine/availability/id
+        [HttpGet("availability/{id}")]
+        public async Task<ActionResult<IEnumerable<MachineAvailability>>> GetMachineAvailability(string id)
         {
-            var machine = await _context.Machine.FindAsync(id);
-
-            if (machine == null)
-            {
-                return NotFound();
-            }
-
-            return machine;
+            return await _context.MachineAvailability
+                .Where(m => m.MachineId == id)
+                .Include(m => m.Beverage)
+                .Include(m => m.Pump)
+                .ToListAsync();
         }
 
         // PUT: api/Machines/5
