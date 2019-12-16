@@ -6,10 +6,11 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using BottleStopAPI.BottleStop;
+using BottleStopAPI.Constants;
 
 namespace BottleStopAPI.Controllers
 {
-    [Route("api/[controller]")]
+    [Route(ControllersName.userController)]
     [ApiController]
     public class UsersController : ControllerBase
     {
@@ -21,10 +22,19 @@ namespace BottleStopAPI.Controllers
         }
 
         // GET: api/Users
-        [HttpGet]
-        public async Task<ActionResult<IEnumerable<User>>> GetUser()
+        [HttpGet("bottle/{id}")]
+        public async Task<ActionResult<UserBottle>> GetUserBottle(string id)
         {
-            return await _context.User.ToListAsync();
+            UserBottle bottleUser = await _context.UserBottle
+                .Where(UserBottle => UserBottle.BottleId == id)
+                .Include("User")
+                .Include("Bottle")
+                .FirstOrDefaultAsync();
+
+            if (bottleUser == null)
+                return NotFound();
+
+            return bottleUser;
         }
 
         // GET: api/Users/5
