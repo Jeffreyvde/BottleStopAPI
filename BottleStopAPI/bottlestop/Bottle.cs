@@ -11,9 +11,8 @@ namespace BottleStopAPI.BottleStop
             UserBottle = new HashSet<UserBottle>();
         }
 
-        public int BottleId { get; set; }
+        public string BottleId { get; set; }
         public string SerialCode { get; set; }
-        public string RfidCode { get; set; }
 
         public virtual ICollection<BottleModel> BottleModel { get; set; }
         public virtual ICollection<UserBottle> UserBottle { get; set; }

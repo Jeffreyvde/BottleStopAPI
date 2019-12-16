@@ -7,17 +7,17 @@ namespace BottleStopAPI.BottleStop
     {
         public Machine()
         {
-            AvailableBeverage = new HashSet<AvailableBeverage>();
-            MachinePump = new HashSet<MachinePump>();
+            BeveragePrice = new HashSet<BeveragePrice>();
+            MachineAvailability = new HashSet<MachineAvailability>();
         }
 
-        public int MachineId { get; set; }
+        public string MachineId { get; set; }
         public int? GpsCoordiantesId { get; set; }
         public int? FilledAmount { get; set; }
         public string ModelName { get; set; }
 
         public virtual GpsCoordinates GpsCoordiantes { get; set; }
-        public virtual ICollection<AvailableBeverage> AvailableBeverage { get; set; }
-        public virtual ICollection<MachinePump> MachinePump { get; set; }
+        public virtual ICollection<BeveragePrice> BeveragePrice { get; set; }
+        public virtual ICollection<MachineAvailability> MachineAvailability { get; set; }
     }
 }

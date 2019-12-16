@@ -7,7 +7,7 @@ namespace BottleStopAPI.BottleStop
     {
         public Pump()
         {
-            MachinePump = new HashSet<MachinePump>();
+            MachineAvailability = new HashSet<MachineAvailability>();
             PumpPin = new HashSet<PumpPin>();
         }
 
@@ -15,7 +15,7 @@ namespace BottleStopAPI.BottleStop
         public string PumpName { get; set; }
         public string PumpType { get; set; }
 
-        public virtual ICollection<MachinePump> MachinePump { get; set; }
+        public virtual ICollection<MachineAvailability> MachineAvailability { get; set; }
         public virtual ICollection<PumpPin> PumpPin { get; set; }
     }
 }

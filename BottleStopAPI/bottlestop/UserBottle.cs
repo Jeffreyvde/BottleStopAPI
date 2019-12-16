@@ -7,7 +7,7 @@ namespace BottleStopAPI.BottleStop
     {
         public int UserBottleId { get; set; }
         public int UserId { get; set; }
-        public int BottleId { get; set; }
+        public string BottleId { get; set; }
 
         public virtual Bottle Bottle { get; set; }
         public virtual User User { get; set; }
