@@ -21,99 +21,54 @@ namespace BottleStopAPI.Controllers
             _context = context;
         }
 
-        // GET: api/Users
+        /// <summary>
+        ///     Returns the username, user id, bottle size and balance. 
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
         [HttpGet("bottle/{id}")]
         public async Task<ActionResult<UserBottle>> GetUserBottle(string id)
         {
             UserBottle bottleUser = await _context.UserBottle
-                .Where(UserBottle => UserBottle.BottleId == id)
-                .Include("User")
-                .Include("Bottle")
-                .FirstOrDefaultAsync();
+                .Where(bu => bu.BottleId == id)
+                .Include(u => u.User)
+                .Include(b => b.Bottle)
+                    .ThenInclude(bm => bm.BottleModel)
+                    .FirstOrDefaultAsync();
 
             if (bottleUser == null)
                 return NotFound();
 
+            bottleUser.User.Password = null;
+
             return bottleUser;
         }
 
-        // GET: api/Users/5
-        [HttpGet("{id}")]
-        public async Task<ActionResult<User>> GetUser(int id)
+        /// <summary>
+        ///     Return beverages from favorites for users avaliable in machine.
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [HttpGet("favorite/{id}/{machine}")]
+        public async Task<ActionResult<IEnumerable<Favorite>>> GetFavorite(int id, string machine)
         {
-            var user = await _context.User.FindAsync(id);
+            //List<MachineAvailability> machineAvailability = await _context.MachineAvailability
+            //    .Where(m => m.MachineId == machine)
+            //    .Include(b => b.Beverage)
+            //    .ToListAsync();
 
-            if (user == null)
-            {
+            List <Favorite> favorite = await _context.Favorite
+                .Where(u => u.UserId == id)
+                .Include(u => u.User)
+                .Include(b => b.Beverage)
+                    .ThenInclude(b => b.MachineAvailability)
+                .ToListAsync();
+
+            if (favorite == null)
                 return NotFound();
-            }
 
-            return user;
-        }
-
-        // PUT: api/Users/5
-        // To protect from overposting attacks, please enable the specific properties you want to bind to, for
-        // more details see https://aka.ms/RazorPagesCRUD.
-        [HttpPut("{id}")]
-        public async Task<IActionResult> PutUser(int id, User user)
-        {
-            if (id != user.UserId)
-            {
-                return BadRequest();
-            }
-
-            _context.Entry(user).State = EntityState.Modified;
-
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!UserExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
-
-            return NoContent();
-        }
-
-        // POST: api/Users
-        // To protect from overposting attacks, please enable the specific properties you want to bind to, for
-        // more details see https://aka.ms/RazorPagesCRUD.
-        [HttpPost]
-        public async Task<ActionResult<User>> PostUser(User user)
-        {
-            _context.User.Add(user);
-            await _context.SaveChangesAsync();
-
-            return CreatedAtAction("GetUser", new { id = user.UserId }, user);
-        }
-
-        // DELETE: api/Users/5
-        [HttpDelete("{id}")]
-        public async Task<ActionResult<User>> DeleteUser(int id)
-        {
-            var user = await _context.User.FindAsync(id);
-            if (user == null)
-            {
-                return NotFound();
-            }
-
-            _context.User.Remove(user);
-            await _context.SaveChangesAsync();
-
-            return user;
-        }
-
-        private bool UserExists(int id)
-        {
-            return _context.User.Any(e => e.UserId == id);
+            return favorite;
         }
     }
 }
+

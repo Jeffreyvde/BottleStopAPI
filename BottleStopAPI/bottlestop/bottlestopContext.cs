@@ -16,7 +16,6 @@ namespace BottleStopAPI.BottleStop
         }
 
         public virtual DbSet<Address> Address { get; set; }
-        public virtual DbSet<Balance> Balance { get; set; }
         public virtual DbSet<BalanceTransaction> BalanceTransaction { get; set; }
         public virtual DbSet<Beverage> Beverage { get; set; }
         public virtual DbSet<BeveragePrice> BeveragePrice { get; set; }
@@ -40,6 +39,15 @@ namespace BottleStopAPI.BottleStop
         public virtual DbSet<Region> Region { get; set; }
         public virtual DbSet<User> User { get; set; }
         public virtual DbSet<UserBottle> UserBottle { get; set; }
+
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        {
+            if (!optionsBuilder.IsConfigured)
+            {
+#warning To protect potentially sensitive information in your connection string, you should move it out of source code. See http://go.microsoft.com/fwlink/?LinkId=723263 for guidance on storing connection strings.
+                optionsBuilder.UseMySql("server=bottle-stop-database.mysql.database.azure.com;port=3306;user=BottleStopAdmin@bottle-stop-database;password=Rx4NK8x*nQc*;database=BottleStop", x => x.ServerVersion("8.0.15-mysql"));
+            }
+        }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -99,27 +107,9 @@ namespace BottleStopAPI.BottleStop
                     .HasConstraintName("address_country_id");
             });
 
-            modelBuilder.Entity<Balance>(entity =>
-            {
-                entity.ToTable("balance");
-
-                entity.HasIndex(e => e.BalanceId)
-                    .HasName("balance_id_UNIQUE")
-                    .IsUnique();
-
-                entity.Property(e => e.BalanceId)
-                    .HasColumnName("balance_id")
-                    .HasColumnType("int(11)");
-
-                entity.Property(e => e.BalanceAmount).HasColumnName("balance_amount");
-            });
-
             modelBuilder.Entity<BalanceTransaction>(entity =>
             {
                 entity.ToTable("balance_transaction");
-
-                entity.HasIndex(e => e.BalanceId)
-                    .HasName("balance_transaction_balance_id_idx");
 
                 entity.HasIndex(e => e.BalanceTransactionId)
                     .HasName("balance_transaction_id_UNIQUE")
@@ -132,10 +122,6 @@ namespace BottleStopAPI.BottleStop
                     .HasColumnName("balance_transaction_id")
                     .HasColumnType("int(11)");
 
-                entity.Property(e => e.BalanceId)
-                    .HasColumnName("balance_id")
-                    .HasColumnType("int(11)");
-
                 entity.Property(e => e.Change)
                     .HasColumnName("change")
                     .HasColumnType("int(11)");
@@ -143,12 +129,6 @@ namespace BottleStopAPI.BottleStop
                 entity.Property(e => e.UserId)
                     .HasColumnName("user_id")
                     .HasColumnType("int(11)");
-
-                entity.HasOne(d => d.Balance)
-                    .WithMany(p => p.BalanceTransaction)
-                    .HasForeignKey(d => d.BalanceId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("balance_transaction_balance_id");
 
                 entity.HasOne(d => d.User)
                     .WithMany(p => p.BalanceTransaction)
@@ -521,17 +501,14 @@ namespace BottleStopAPI.BottleStop
 
             modelBuilder.Entity<MachineAvailability>(entity =>
             {
-                entity.HasKey(e => e.AvailableBeverageId)
-                    .HasName("PRIMARY");
-
                 entity.ToTable("machine_availability");
-
-                entity.HasIndex(e => e.AvailableBeverageId)
-                    .HasName("available_beverage_id_UNIQUE")
-                    .IsUnique();
 
                 entity.HasIndex(e => e.BeverageId)
                     .HasName("available_beverage_beverage_id_idx");
+
+                entity.HasIndex(e => e.MachineAvailabilityId)
+                    .HasName("available_beverage_id_UNIQUE")
+                    .IsUnique();
 
                 entity.HasIndex(e => e.MachineId)
                     .HasName("available_beverage_machine_id_idx");
@@ -539,8 +516,8 @@ namespace BottleStopAPI.BottleStop
                 entity.HasIndex(e => e.PumpId)
                     .HasName("machine_availability_pump_id_idx");
 
-                entity.Property(e => e.AvailableBeverageId)
-                    .HasColumnName("available_beverage_id")
+                entity.Property(e => e.MachineAvailabilityId)
+                    .HasColumnName("machine_availability_id")
                     .HasColumnType("int(11)");
 
                 entity.Property(e => e.BeverageId)
@@ -847,6 +824,8 @@ namespace BottleStopAPI.BottleStop
                 entity.Property(e => e.AddressId)
                     .HasColumnName("address_id")
                     .HasColumnType("int(11)");
+
+                entity.Property(e => e.Balance).HasColumnName("balance");
 
                 entity.Property(e => e.DateOfBirth)
                     .HasColumnName("date_of_birth")
