@@ -52,11 +52,6 @@ namespace BottleStopAPI.Controllers
         [HttpGet("favorite/{id}/{machine}")]
         public async Task<ActionResult<IEnumerable<Favorite>>> GetFavorite(int id, string machine)
         {
-            //List<MachineAvailability> machineAvailability = await _context.MachineAvailability
-            //    .Where(m => m.MachineId == machine)
-            //    .Include(b => b.Beverage)
-            //    .ToListAsync();
-
             List <Favorite> favorite = await _context.Favorite
                 .Where(u => u.UserId == id)
                 .Include(u => u.User)
@@ -66,6 +61,36 @@ namespace BottleStopAPI.Controllers
 
             if (favorite == null)
                 return NotFound();
+
+            return favorite;
+        }
+
+
+        // POST: /favorite
+        // To protect from overposting attacks, please enable the specific properties you want to bind to, for
+        // more details see https://aka.ms/RazorPagesCRUD.
+        [HttpPost("/favorite/add")]
+        public async Task<ActionResult<Favorite>> PostFavorite(int user, int beverage, Favorite favorite)
+        {
+            var fav = new Favorite { UserId = user, BeverageId = beverage };
+            _context.Favorite.Add(fav);
+            await _context.SaveChangesAsync();
+
+            return CreatedAtAction("Getfavorite", new { id = favorite.FavoriteId }, favorite);
+        }
+
+        // DELETE: /favorite/5
+        [HttpDelete("/favorite/delete/{id}")]
+        public async Task<ActionResult<Favorite>> DeleteFavorite(int id)
+        {
+            var favorite = await _context.Favorite.FindAsync(id);
+            if (favorite == null)
+            {
+                return NotFound();
+            }
+
+            _context.Favorite.Remove(favorite);
+            await _context.SaveChangesAsync();
 
             return favorite;
         }
