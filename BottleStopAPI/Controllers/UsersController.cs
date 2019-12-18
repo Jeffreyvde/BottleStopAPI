@@ -50,36 +50,53 @@ namespace BottleStopAPI.Controllers
         /// <param name="id"></param>
         /// <returns></returns>
         [HttpGet("favorite/{id}/{machine}")]
-        public async Task<ActionResult<IEnumerable<Favorite>>> GetFavorite(int id, string machine)
+        public async Task<ActionResult<IEnumerable<Beverage>>> GetFavorite(int id, string machine)
         {
-            List <Favorite> favorite = await _context.Favorite
-                .Where(u => u.UserId == id)
-                .Include(u => u.User)
-                .Include(b => b.Beverage)
-                    .ThenInclude(b => b.MachineAvailability)
+            List <Beverage> beverage = await _context.Beverage
+                .FromSqlRaw("select * " +
+                "from beverage as b " +
+                    "inner join favorite as f " +
+                        "on b.beverage_id = f.beverage_id " +
+                    "inner join `user` as u " +
+                        "on f.user_id = u.user_id " +
+                    "inner join machine_availability as ma " +
+                        "on b.beverage_id = ma.beverage_id " +
+                        "and ma.machine_id = {0} " +
+                    "where u.user_id = {1}", machine, id)
                 .ToListAsync();
 
-            if (favorite == null)
+
+            if (beverage == null)
                 return NotFound();
 
-            return favorite;
+            return beverage;
         }
 
 
-        // POST: /favorite
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="user"></param>
+        /// <param name="beverage"></param>
+        /// <param name="favorite"></param>
+        /// <returns></returns>
         // To protect from overposting attacks, please enable the specific properties you want to bind to, for
         // more details see https://aka.ms/RazorPagesCRUD.
         [HttpPost("/favorite/add")]
-        public async Task<ActionResult<Favorite>> PostFavorite(int user, int beverage, Favorite favorite)
+        public async Task<ActionResult<Favorite>> PostFavorite([FromBody]int user, int beverage)
         {
             var fav = new Favorite { UserId = user, BeverageId = beverage };
             _context.Favorite.Add(fav);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("Getfavorite", new { id = favorite.FavoriteId }, favorite);
+            return CreatedAtAction("Getfavorite", new { id = fav.BeverageId }, fav);
         }
 
-        // DELETE: /favorite/5
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
         [HttpDelete("/favorite/delete/{id}")]
         public async Task<ActionResult<Favorite>> DeleteFavorite(int id)
         {
