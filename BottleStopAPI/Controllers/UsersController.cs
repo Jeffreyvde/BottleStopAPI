@@ -53,16 +53,20 @@ namespace BottleStopAPI.Controllers
         public async Task<ActionResult<IEnumerable<Beverage>>> GetFavorite(int id, string machine)
         {
             List <Beverage> beverage = await _context.Beverage
-                .FromSqlRaw("select * " +
-                "from beverage as b " +
-                    "inner join favorite as f " +
-                        "on b.beverage_id = f.beverage_id " +
-                    "inner join `user` as u " +
-                        "on f.user_id = u.user_id " +
-                    "inner join machine_availability as ma " +
-                        "on b.beverage_id = ma.beverage_id " +
-                        "and ma.machine_id = {0} " +
-                    "where u.user_id = {1}", machine, id)
+                .Include(f => f.Favorite)
+                    .ThenInclude(u => u.User)
+                .Include(ma => ma.MachineAvailability)
+
+                //.FromSqlRaw("select * " +
+                //"from beverage as b " +
+                //    "inner join favorite as f " +
+                //        "on b.beverage_id = f.beverage_id " +
+                //    "inner join `user` as u " +
+                //        "on f.user_id = u.user_id " +
+                //    "inner join machine_availability as ma " +
+                //        "on b.beverage_id = ma.beverage_id " +
+                //        "and ma.machine_id = {0} " +
+                //    "where u.user_id = {1}", machine, id)
                 .ToListAsync();
 
 
