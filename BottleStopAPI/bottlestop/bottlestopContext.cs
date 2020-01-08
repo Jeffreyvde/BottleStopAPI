@@ -16,11 +16,10 @@ namespace BottleStopAPI.BottleStop
         }
 
         public virtual DbSet<Address> Address { get; set; }
-        public virtual DbSet<Balance> Balance { get; set; }
         public virtual DbSet<BalanceTransaction> BalanceTransaction { get; set; }
         public virtual DbSet<Beverage> Beverage { get; set; }
         public virtual DbSet<BeveragePrice> BeveragePrice { get; set; }
-        public virtual DbSet<BeverageRecipe> BeverageRecipe { get; set; }
+        public virtual DbSet<BeverageType> BeverageType { get; set; }
         public virtual DbSet<Bottle> Bottle { get; set; }
         public virtual DbSet<BottleModel> BottleModel { get; set; }
         public virtual DbSet<Brand> Brand { get; set; }
@@ -28,15 +27,16 @@ namespace BottleStopAPI.BottleStop
         public virtual DbSet<Country> Country { get; set; }
         public virtual DbSet<Favorite> Favorite { get; set; }
         public virtual DbSet<GpsCoordinates> GpsCoordinates { get; set; }
+        public virtual DbSet<Ingredient> Ingredient { get; set; }
         public virtual DbSet<Machine> Machine { get; set; }
         public virtual DbSet<MachineAvailability> MachineAvailability { get; set; }
-        public virtual DbSet<MixCombination> MixCombination { get; set; }
         public virtual DbSet<Order> Order { get; set; }
         public virtual DbSet<OrderDetail> OrderDetail { get; set; }
         public virtual DbSet<Pin> Pin { get; set; }
         public virtual DbSet<PinMode> PinMode { get; set; }
         public virtual DbSet<Pump> Pump { get; set; }
         public virtual DbSet<PumpPin> PumpPin { get; set; }
+        public virtual DbSet<Recipe> Recipe { get; set; }
         public virtual DbSet<Region> Region { get; set; }
         public virtual DbSet<User> User { get; set; }
         public virtual DbSet<UserBottle> UserBottle { get; set; }
@@ -99,27 +99,9 @@ namespace BottleStopAPI.BottleStop
                     .HasConstraintName("address_country_id");
             });
 
-            modelBuilder.Entity<Balance>(entity =>
-            {
-                entity.ToTable("balance");
-
-                entity.HasIndex(e => e.BalanceId)
-                    .HasName("balance_id_UNIQUE")
-                    .IsUnique();
-
-                entity.Property(e => e.BalanceId)
-                    .HasColumnName("balance_id")
-                    .HasColumnType("int(11)");
-
-                entity.Property(e => e.BalanceAmount).HasColumnName("balance_amount");
-            });
-
             modelBuilder.Entity<BalanceTransaction>(entity =>
             {
                 entity.ToTable("balance_transaction");
-
-                entity.HasIndex(e => e.BalanceId)
-                    .HasName("balance_transaction_balance_id_idx");
 
                 entity.HasIndex(e => e.BalanceTransactionId)
                     .HasName("balance_transaction_id_UNIQUE")
@@ -132,10 +114,6 @@ namespace BottleStopAPI.BottleStop
                     .HasColumnName("balance_transaction_id")
                     .HasColumnType("int(11)");
 
-                entity.Property(e => e.BalanceId)
-                    .HasColumnName("balance_id")
-                    .HasColumnType("int(11)");
-
                 entity.Property(e => e.Change)
                     .HasColumnName("change")
                     .HasColumnType("int(11)");
@@ -143,12 +121,6 @@ namespace BottleStopAPI.BottleStop
                 entity.Property(e => e.UserId)
                     .HasColumnName("user_id")
                     .HasColumnType("int(11)");
-
-                entity.HasOne(d => d.Balance)
-                    .WithMany(p => p.BalanceTransaction)
-                    .HasForeignKey(d => d.BalanceId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("balance_transaction_balance_id");
 
                 entity.HasOne(d => d.User)
                     .WithMany(p => p.BalanceTransaction)
@@ -164,6 +136,9 @@ namespace BottleStopAPI.BottleStop
                 entity.HasIndex(e => e.BeverageId)
                     .HasName("beverage_id_UNIQUE")
                     .IsUnique();
+
+                entity.HasIndex(e => e.BeverageTypeId)
+                    .HasName("beverage_beverage_type_id_idx");
 
                 entity.HasIndex(e => e.BrandId)
                     .HasName("beverage_brand_id_idx");
@@ -185,9 +160,18 @@ namespace BottleStopAPI.BottleStop
                     .HasCharSet("utf8")
                     .HasCollation("utf8_general_ci");
 
+                entity.Property(e => e.BeverageTypeId)
+                    .HasColumnName("beverage_type_id")
+                    .HasColumnType("int(11)");
+
                 entity.Property(e => e.BrandId)
                     .HasColumnName("brand_id")
                     .HasColumnType("int(11)");
+
+                entity.HasOne(d => d.BeverageType)
+                    .WithMany(p => p.Beverage)
+                    .HasForeignKey(d => d.BeverageTypeId)
+                    .HasConstraintName("beverage_beverage_type_id");
 
                 entity.HasOne(d => d.Brand)
                     .WithMany(p => p.Beverage)
@@ -239,23 +223,23 @@ namespace BottleStopAPI.BottleStop
                     .HasConstraintName("beverage_price_machine_id");
             });
 
-            modelBuilder.Entity<BeverageRecipe>(entity =>
+            modelBuilder.Entity<BeverageType>(entity =>
             {
-                entity.ToTable("beverage_recipe");
+                entity.ToTable("beverage_type");
 
-                entity.HasIndex(e => e.BeverageRecipeId)
-                    .HasName("beverage_recipe_UNIQUE")
-                    .IsUnique();
-
-                entity.Property(e => e.BeverageRecipeId)
-                    .HasColumnName("beverage_recipe_id")
+                entity.Property(e => e.BeverageTypeId)
+                    .HasColumnName("beverage_type_id")
                     .HasColumnType("int(11)");
 
-                entity.Property(e => e.FillRatio).HasColumnName("fill_ratio");
-
-                entity.Property(e => e.MixName)
+                entity.Property(e => e.BeverageType1)
                     .IsRequired()
-                    .HasColumnName("mix_name")
+                    .HasColumnName("beverage_type")
+                    .HasColumnType("varchar(45)")
+                    .HasCharSet("utf8")
+                    .HasCollation("utf8_general_ci");
+
+                entity.Property(e => e.TypeImage)
+                    .HasColumnName("type_image")
                     .HasColumnType("varchar(45)")
                     .HasCharSet("utf8")
                     .HasCollation("utf8_general_ci");
@@ -480,6 +464,26 @@ namespace BottleStopAPI.BottleStop
                 entity.Property(e => e.Longitude).HasColumnName("longitude");
             });
 
+            modelBuilder.Entity<Ingredient>(entity =>
+            {
+                entity.ToTable("ingredient");
+
+                entity.HasIndex(e => e.IngredientId)
+                    .HasName("beverage_recipe_UNIQUE")
+                    .IsUnique();
+
+                entity.Property(e => e.IngredientId)
+                    .HasColumnName("ingredient_id")
+                    .HasColumnType("int(11)");
+
+                entity.Property(e => e.MixName)
+                    .IsRequired()
+                    .HasColumnName("mix_name")
+                    .HasColumnType("varchar(45)")
+                    .HasCharSet("utf8")
+                    .HasCollation("utf8_general_ci");
+            });
+
             modelBuilder.Entity<Machine>(entity =>
             {
                 entity.ToTable("machine");
@@ -521,17 +525,14 @@ namespace BottleStopAPI.BottleStop
 
             modelBuilder.Entity<MachineAvailability>(entity =>
             {
-                entity.HasKey(e => e.AvailableBeverageId)
-                    .HasName("PRIMARY");
-
                 entity.ToTable("machine_availability");
-
-                entity.HasIndex(e => e.AvailableBeverageId)
-                    .HasName("available_beverage_id_UNIQUE")
-                    .IsUnique();
 
                 entity.HasIndex(e => e.BeverageId)
                     .HasName("available_beverage_beverage_id_idx");
+
+                entity.HasIndex(e => e.MachineAvailabilityId)
+                    .HasName("available_beverage_id_UNIQUE")
+                    .IsUnique();
 
                 entity.HasIndex(e => e.MachineId)
                     .HasName("available_beverage_machine_id_idx");
@@ -539,8 +540,8 @@ namespace BottleStopAPI.BottleStop
                 entity.HasIndex(e => e.PumpId)
                     .HasName("machine_availability_pump_id_idx");
 
-                entity.Property(e => e.AvailableBeverageId)
-                    .HasColumnName("available_beverage_id")
+                entity.Property(e => e.MachineAvailabilityId)
+                    .HasColumnName("machine_availability_id")
                     .HasColumnType("int(11)");
 
                 entity.Property(e => e.BeverageId)
@@ -580,45 +581,6 @@ namespace BottleStopAPI.BottleStop
                     .HasForeignKey(d => d.PumpId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("machine_availability_pump_id");
-            });
-
-            modelBuilder.Entity<MixCombination>(entity =>
-            {
-                entity.ToTable("mix_combination");
-
-                entity.HasIndex(e => e.BeverageId)
-                    .HasName("mix_combination_beverage_id_idx");
-
-                entity.HasIndex(e => e.BeverageRecpieId)
-                    .HasName("mix_combination_beverage_recipe_id_idx");
-
-                entity.HasIndex(e => e.MixCombinationId)
-                    .HasName("mix_combination_id_UNIQUE")
-                    .IsUnique();
-
-                entity.Property(e => e.MixCombinationId)
-                    .HasColumnName("mix_combination_id")
-                    .HasColumnType("int(11)");
-
-                entity.Property(e => e.BeverageId)
-                    .HasColumnName("beverage_id")
-                    .HasColumnType("int(11)");
-
-                entity.Property(e => e.BeverageRecpieId)
-                    .HasColumnName("beverage_recpie_id")
-                    .HasColumnType("int(11)");
-
-                entity.HasOne(d => d.Beverage)
-                    .WithMany(p => p.MixCombination)
-                    .HasForeignKey(d => d.BeverageId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("mix_combination_beverage_id");
-
-                entity.HasOne(d => d.BeverageRecpie)
-                    .WithMany(p => p.MixCombination)
-                    .HasForeignKey(d => d.BeverageRecpieId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("mix_combination_beverage_recipe_id");
             });
 
             modelBuilder.Entity<Order>(entity =>
@@ -749,12 +711,19 @@ namespace BottleStopAPI.BottleStop
             {
                 entity.ToTable("pump");
 
+                entity.HasIndex(e => e.IngredientId)
+                    .HasName("pump_ingredient_id_idx");
+
                 entity.HasIndex(e => e.PumpId)
                     .HasName("pump_id_UNIQUE")
                     .IsUnique();
 
                 entity.Property(e => e.PumpId)
                     .HasColumnName("pump_id")
+                    .HasColumnType("int(11)");
+
+                entity.Property(e => e.IngredientId)
+                    .HasColumnName("ingredient_id")
                     .HasColumnType("int(11)");
 
                 entity.Property(e => e.PumpName)
@@ -768,6 +737,12 @@ namespace BottleStopAPI.BottleStop
                     .HasColumnType("varchar(45)")
                     .HasCharSet("utf8")
                     .HasCollation("utf8_general_ci");
+
+                entity.HasOne(d => d.Ingredient)
+                    .WithMany(p => p.Pump)
+                    .HasForeignKey(d => d.IngredientId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("pump_ingredient_id");
             });
 
             modelBuilder.Entity<PumpPin>(entity =>
@@ -809,6 +784,47 @@ namespace BottleStopAPI.BottleStop
                     .HasConstraintName("pump_pin_pump_id");
             });
 
+            modelBuilder.Entity<Recipe>(entity =>
+            {
+                entity.ToTable("recipe");
+
+                entity.HasIndex(e => e.BeverageId)
+                    .HasName("mix_combination_beverage_id_idx");
+
+                entity.HasIndex(e => e.IngredientId)
+                    .HasName("mix_combination_beverage_recipe_id_idx");
+
+                entity.HasIndex(e => e.RecipeId)
+                    .HasName("mix_combination_id_UNIQUE")
+                    .IsUnique();
+
+                entity.Property(e => e.RecipeId)
+                    .HasColumnName("recipe_id")
+                    .HasColumnType("int(11)");
+
+                entity.Property(e => e.BeverageId)
+                    .HasColumnName("beverage_id")
+                    .HasColumnType("int(11)");
+
+                entity.Property(e => e.IngredientId)
+                    .HasColumnName("ingredient_id")
+                    .HasColumnType("int(11)");
+
+                entity.Property(e => e.Ratio).HasColumnName("ratio");
+
+                entity.HasOne(d => d.Beverage)
+                    .WithMany(p => p.Recipe)
+                    .HasForeignKey(d => d.BeverageId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("recipe_beverage_id");
+
+                entity.HasOne(d => d.Ingredient)
+                    .WithMany(p => p.Recipe)
+                    .HasForeignKey(d => d.IngredientId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("recipe_ingredient_id");
+            });
+
             modelBuilder.Entity<Region>(entity =>
             {
                 entity.ToTable("region");
@@ -847,6 +863,8 @@ namespace BottleStopAPI.BottleStop
                 entity.Property(e => e.AddressId)
                     .HasColumnName("address_id")
                     .HasColumnType("int(11)");
+
+                entity.Property(e => e.Balance).HasColumnName("balance");
 
                 entity.Property(e => e.DateOfBirth)
                     .HasColumnName("date_of_birth")

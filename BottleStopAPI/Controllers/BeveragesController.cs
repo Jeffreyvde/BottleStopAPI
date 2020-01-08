@@ -6,10 +6,11 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using BottleStopAPI.BottleStop;
+using BottleStopAPI.Constants;
 
 namespace BottleStopAPI.Controllers
 {
-    [Route("api/[controller]")]
+    [Route(ControllersName.beverageController)]
     [ApiController]
     public class BeveragesController : ControllerBase
     {
@@ -38,7 +39,25 @@ namespace BottleStopAPI.Controllers
                 return NotFound();
             }
 
+
             return beverage;
+        }
+
+
+        // GET: beverage/beverage ID/recipe
+        /// <summary>
+        /// This will return the recipe from the api
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [HttpGet("{id}/recipe")]
+        public ActionResult<Recipe[]> GetBeverageRecipe(int id)
+        {
+            IQueryable<Recipe> beverages = _context.Recipe.Where(m => m.BeverageId == id)
+            .Include(m => m.Ingredient);
+
+
+            return beverages.ToArray();
         }
 
         // PUT: api/Beverages/5
