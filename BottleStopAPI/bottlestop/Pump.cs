@@ -12,9 +12,11 @@ namespace BottleStopAPI.BottleStop
         }
 
         public int PumpId { get; set; }
+        public int IngredientId { get; set; }
         public string PumpName { get; set; }
         public string PumpType { get; set; }
 
+        public virtual Ingredient Ingredient { get; set; }
         public virtual ICollection<MachineAvailability> MachineAvailability { get; set; }
         public virtual ICollection<PumpPin> PumpPin { get; set; }
     }
