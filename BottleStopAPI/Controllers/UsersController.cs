@@ -10,6 +10,7 @@ using BottleStopAPI.Constants;
 
 namespace BottleStopAPI.Controllers
 {
+    [Produces("application/json")]
     [Route(ControllersName.userController)]
     [ApiController]
     public class UsersController : ControllerBase
@@ -50,25 +51,13 @@ namespace BottleStopAPI.Controllers
         /// <param name="id"></param>
         /// <returns></returns>
         [HttpGet("favorite/{id}/{machine}")]
-        public async Task<ActionResult<IEnumerable<Beverage>>> GetFavorite(int id, string machine)
+        public async Task<ActionResult<IEnumerable<Beverage>>> GetUserFavoriteBeverageFromMachine(int id, string machine)
         {
             List <Beverage> beverage = await _context.Beverage
                 .Include(f => f.Favorite)
                     .ThenInclude(u => u.User)
                 .Include(ma => ma.MachineAvailability)
-
-                //.FromSqlRaw("select * " +
-                //"from beverage as b " +
-                //    "inner join favorite as f " +
-                //        "on b.beverage_id = f.beverage_id " +
-                //    "inner join `user` as u " +
-                //        "on f.user_id = u.user_id " +
-                //    "inner join machine_availability as ma " +
-                //        "on b.beverage_id = ma.beverage_id " +
-                //        "and ma.machine_id = {0} " +
-                //    "where u.user_id = {1}", machine, id)
                 .ToListAsync();
-
 
             if (beverage == null)
                 return NotFound();
@@ -76,28 +65,42 @@ namespace BottleStopAPI.Controllers
             return beverage;
         }
 
+        /// <summary>
+        ///     Return favorite based on favorite id
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [HttpGet("favorite/{id}")]
+        public async Task<ActionResult<IEnumerable<Favorite>>> GetFavorite(int id)
+        {
+            List<Favorite> favorite = await _context.Favorite
+                .Where(i => i.FavoriteId == id)
+                .ToListAsync();
+
+            if (favorite == null)
+                return NotFound();
+
+            return favorite;
+        }
 
         /// <summary>
-        /// 
+        ///     Add users favorite beverage
         /// </summary>
-        /// <param name="user"></param>
-        /// <param name="beverage"></param>
         /// <param name="favorite"></param>
         /// <returns></returns>
         // To protect from overposting attacks, please enable the specific properties you want to bind to, for
         // more details see https://aka.ms/RazorPagesCRUD.
-        [HttpPost("/favorite/add")]
-        public async Task<ActionResult<Favorite>> PostFavorite([FromBody]int user, int beverage)
+        [HttpPost("favorite/add")]
+        public async Task<ActionResult<Favorite>> PostFavorite([FromBody]Favorite favorite)
         {
-            var fav = new Favorite { UserId = user, BeverageId = beverage };
-            _context.Favorite.Add(fav);
+            _context.Favorite.Add(favorite);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("Getfavorite", new { id = fav.BeverageId }, fav);
+            return CreatedAtAction(nameof(GetFavorite), new { id = favorite.FavoriteId }, favorite);
         }
 
         /// <summary>
-        /// 
+        ///     Delete favorite beverage
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
@@ -117,4 +120,3 @@ namespace BottleStopAPI.Controllers
         }
     }
 }
-
