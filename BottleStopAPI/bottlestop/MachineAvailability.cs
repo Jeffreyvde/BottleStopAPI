@@ -5,7 +5,7 @@ namespace BottleStopAPI.BottleStop
 {
     public partial class MachineAvailability
     {
-        public int AvailableBeverageId { get; set; }
+        public int MachineAvailabilityId { get; set; }
         public string MachineId { get; set; }
         public int BeverageId { get; set; }
         public int PumpId { get; set; }
