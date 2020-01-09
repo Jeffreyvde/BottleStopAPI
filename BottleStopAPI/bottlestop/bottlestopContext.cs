@@ -33,7 +33,6 @@ namespace BottleStopAPI.BottleStop
         public virtual DbSet<Order> Order { get; set; }
         public virtual DbSet<OrderDetail> OrderDetail { get; set; }
         public virtual DbSet<Pin> Pin { get; set; }
-        public virtual DbSet<PinMode> PinMode { get; set; }
         public virtual DbSet<Pump> Pump { get; set; }
         public virtual DbSet<PumpPin> PumpPin { get; set; }
         public virtual DbSet<Recipe> Recipe { get; set; }
@@ -658,16 +657,16 @@ namespace BottleStopAPI.BottleStop
                     .HasName("pin_id_UNIQUE")
                     .IsUnique();
 
-                entity.HasIndex(e => e.PinModeId)
-                    .HasName("pin_pin_mode_id_idx");
-
                 entity.Property(e => e.PinId)
                     .HasColumnName("pin_id")
                     .HasColumnType("int(11)");
 
-                entity.Property(e => e.PinModeId)
-                    .HasColumnName("pin_mode_id")
-                    .HasColumnType("int(11)");
+                entity.Property(e => e.PinMode)
+                    .IsRequired()
+                    .HasColumnName("pin_mode")
+                    .HasColumnType("varchar(45)")
+                    .HasCharSet("utf8")
+                    .HasCollation("utf8_general_ci");
 
                 entity.Property(e => e.PinName)
                     .HasColumnName("pin_name")
@@ -676,33 +675,9 @@ namespace BottleStopAPI.BottleStop
                     .HasCollation("utf8_general_ci");
 
                 entity.Property(e => e.PinNumber)
-                    .HasColumnName("pin_number")
-                    .HasColumnType("int(11)");
-
-                entity.HasOne(d => d.PinMode)
-                    .WithMany(p => p.Pin)
-                    .HasForeignKey(d => d.PinModeId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("pin_pin_mode_id");
-            });
-
-            modelBuilder.Entity<PinMode>(entity =>
-            {
-                entity.ToTable("pin_mode");
-
-                entity.HasIndex(e => e.PinModeId)
-                    .HasName("pin_mode_id_UNIQUE")
-                    .IsUnique();
-
-                entity.Property(e => e.PinModeId)
-                    .HasColumnName("pin_mode_id")
-                    .HasColumnType("int(11)");
-
-                entity.Property(e => e.PinMode1)
                     .IsRequired()
-                    .HasColumnName("pin_mode")
+                    .HasColumnName("pin_number")
                     .HasColumnType("varchar(45)")
-                    .HasComment("INPUT, OUTPUT, or INPUT_PULLUP...")
                     .HasCharSet("utf8")
                     .HasCollation("utf8_general_ci");
             });

@@ -6,10 +6,11 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using BottleStopAPI.BottleStop;
+using BottleStopAPI.Constants;
 
 namespace BottleStopAPI.Controllers
 {
-    [Route("api/[controller]")]
+    [Route(ControllersName.pumpController)]
     [ApiController]
     public class PumpsController : ControllerBase
     {
@@ -39,6 +40,21 @@ namespace BottleStopAPI.Controllers
             }
 
             return pump;
+        }
+
+        // GET: pump/{id}/pins
+        /// <summary>
+        /// Return the pins for this pump
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [HttpGet("{id}/pins")]
+        public ActionResult<PumpPin[]> GetPumpPin(int id)
+        {
+            var pump = _context.PumpPin.Where(pin => pin.PumpId == id)
+                .Include(pin => pin.Pin);
+        
+            return pump.ToArray();
         }
 
         // PUT: api/Pumps/5
