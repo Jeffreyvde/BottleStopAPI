@@ -23,7 +23,7 @@ namespace BottleStopAPI.Controllers
         }
 
         /// <summary>
-        ///     Returns the username, user id, bottle size and balance. 
+        ///     Returns the username, user id, bottle size and balance based on bottle. 
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
@@ -46,16 +46,24 @@ namespace BottleStopAPI.Controllers
         }
 
         /// <summary>
-        ///     Return beverages from favorites for users avaliable in machine.
+        ///     Return users favorite beverages avaliable in machine.
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        [HttpGet("favorite/{id}/{machine}")]
-        public async Task<ActionResult<IEnumerable<Beverage>>> GetUserFavoriteBeverageFromMachine(int id, string machine)
+        [HttpGet("favorite/{uid}/{machine}")]
+        public async Task<ActionResult<IEnumerable<Beverage>>> GetUserFavoriteBeverageFromMachine(int uid, string machine)
         {
+            //var test = _context.Machine
+            //    .Single(m => m.MachineId == machine);
+            
+            //var asd = _context.Entry(test)
+            //    .Collection(b => b.)
+            //    .Query()
+            //    .Count();
             List <Beverage> beverage = await _context.Beverage
                 .Include(f => f.Favorite)
                     .ThenInclude(u => u.User)
+                    .Where()
                 .Include(ma => ma.MachineAvailability)
                 .ToListAsync();
 
@@ -104,16 +112,19 @@ namespace BottleStopAPI.Controllers
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        [HttpDelete("/favorite/delete/{id}")]
-        public async Task<ActionResult<Favorite>> DeleteFavorite(int id)
+        [HttpDelete("favorite/delete/{uid}/{bid}")]
+        public async Task<ActionResult<IEnumerable<Favorite>>> DeleteFavorite(int uid, int bid)
         {
-            var favorite = await _context.Favorite.FindAsync(id);
+            List<Favorite> favorite = await _context.Favorite
+                .Where(i => i.UserId == uid && i.BeverageId == bid)
+                .ToListAsync();
+
             if (favorite == null)
             {
                 return NotFound();
             }
 
-            _context.Favorite.Remove(favorite);
+            _context.Favorite.RemoveRange(favorite);
             await _context.SaveChangesAsync();
 
             return favorite;
