@@ -11,11 +11,10 @@ namespace BottleStopAPI.BottleStop
         }
 
         public int PinId { get; set; }
-        public int PinModeId { get; set; }
-        public int PinNumber { get; set; }
+        public string PinMode { get; set; }
+        public string PinNumber { get; set; }
         public string PinName { get; set; }
 
-        public virtual PinMode PinMode { get; set; }
         public virtual ICollection<PumpPin> PumpPin { get; set; }
     }
 }

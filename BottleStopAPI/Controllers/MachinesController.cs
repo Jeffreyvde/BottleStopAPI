@@ -38,9 +38,6 @@ namespace BottleStopAPI.Controllers
                 .Where(m => m.MachineId == id)
                 .Include(m => m.Beverage)
                 .Include(m => m.Pump)
-                .ThenInclude(p => p.PumpPin)
-                .ThenInclude(p => p.Pin)
-                .ThenInclude(p => p.PinMode)
                 .ToListAsync();
         }
 
