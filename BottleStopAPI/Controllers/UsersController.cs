@@ -10,6 +10,7 @@ using BottleStopAPI.Constants;
 
 namespace BottleStopAPI.Controllers
 {
+    [Produces("application/json")]
     [Route(ControllersName.userController)]
     [ApiController]
     public class UsersController : ControllerBase
@@ -21,99 +22,105 @@ namespace BottleStopAPI.Controllers
             _context = context;
         }
 
-        // GET: api/Users
+         /// <summary>
+        ///     Return favorites based on favorite id
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [HttpGet("favorite/{id}")]
+        public async Task<ActionResult<IEnumerable<Favorite>>> GetFavorites(int id)
+        {
+            List<Favorite> favorites = await _context.Favorite
+                .Where(i => i.FavoriteId == id)
+                .ToListAsync();
+
+            if (favorites == null)
+                return NotFound();
+
+            return favorites;
+        }
+
+        /// <summary>
+        ///     Returns the username, user id, bottle size and balance based on bottle. 
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
         [HttpGet("bottle/{id}")]
         public async Task<ActionResult<UserBottle>> GetUserBottle(string id)
         {
             UserBottle bottleUser = await _context.UserBottle
-                .Where(UserBottle => UserBottle.BottleId == id)
-                .Include("User")
-                .Include("Bottle")
-                .FirstOrDefaultAsync();
+                .Where(bu => bu.BottleId == id)
+                .Include(u => u.User)
+                .Include(b => b.Bottle)
+                    .ThenInclude(bm => bm.BottleModel)
+                    .FirstOrDefaultAsync();
 
             if (bottleUser == null)
                 return NotFound();
 
+            bottleUser.User.Password = null;
+
             return bottleUser;
         }
 
-        // GET: api/Users/5
-        [HttpGet("{id}")]
-        public async Task<ActionResult<User>> GetUser(int id)
+        /// IGNORE THIS!
+        /// <summary>
+        ///     Return users favorite beverages avaliable in machine.
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [HttpGet("favorite/{uid}/{machine}")]
+        public async Task<ActionResult<IEnumerable<Beverage>>> GetUserFavoriteBeverageFromMachine(int uid, string machine)
         {
-            var user = await _context.User.FindAsync(id);
+            List <Beverage> beverage = await _context.Beverage
+                .Include(f => f.Favorite)
+                    .ThenInclude(u => u.User)
+                .Include(ma => ma.MachineAvailability)
+                .ToListAsync();
 
-            if (user == null)
+            if (beverage == null)
+                return NotFound();
+
+            return beverage;
+        }
+
+        /// <summary>
+        ///     Add users favorite beverage
+        /// </summary>
+        /// <param name="favorite"></param>
+        /// <returns></returns>
+        // To protect from overposting attacks, please enable the specific properties you want to bind to, for
+        // more details see https://aka.ms/RazorPagesCRUD.
+        [HttpPost("favorite/add")]
+        public async Task<ActionResult<Favorite>> PostFavorite([FromBody]Favorite favorite)
+        {
+            _context.Favorite.Add(favorite);
+            await _context.SaveChangesAsync();
+
+            return CreatedAtAction(nameof(GetFavorite), new { id = favorite.FavoriteId }, favorite);
+        }
+
+        /// <summary>
+        ///     Delete favorite beverage
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [HttpDelete("favorite/delete/{uid}/{bid}")]
+        public async Task<ActionResult<IEnumerable<Favorite>>> DeleteFavorite(int uid, int bid)
+        {
+            List<Favorite> favorite = await _context.Favorite
+                .Where(i => i.UserId == uid && i.BeverageId == bid)
+                .ToListAsync();
+
+            if (favorite == null)
             {
                 return NotFound();
             }
 
-            return user;
-        }
-
-        // PUT: api/Users/5
-        // To protect from overposting attacks, please enable the specific properties you want to bind to, for
-        // more details see https://aka.ms/RazorPagesCRUD.
-        [HttpPut("{id}")]
-        public async Task<IActionResult> PutUser(int id, User user)
-        {
-            if (id != user.UserId)
-            {
-                return BadRequest();
-            }
-
-            _context.Entry(user).State = EntityState.Modified;
-
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!UserExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
-
-            return NoContent();
-        }
-
-        // POST: api/Users
-        // To protect from overposting attacks, please enable the specific properties you want to bind to, for
-        // more details see https://aka.ms/RazorPagesCRUD.
-        [HttpPost]
-        public async Task<ActionResult<User>> PostUser(User user)
-        {
-            _context.User.Add(user);
+            _context.Favorite.RemoveRange(favorite);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetUser", new { id = user.UserId }, user);
-        }
-
-        // DELETE: api/Users/5
-        [HttpDelete("{id}")]
-        public async Task<ActionResult<User>> DeleteUser(int id)
-        {
-            var user = await _context.User.FindAsync(id);
-            if (user == null)
-            {
-                return NotFound();
-            }
-
-            _context.User.Remove(user);
-            await _context.SaveChangesAsync();
-
-            return user;
-        }
-
-        private bool UserExists(int id)
-        {
-            return _context.User.Any(e => e.UserId == id);
+            return favorite;
         }
     }
 }
