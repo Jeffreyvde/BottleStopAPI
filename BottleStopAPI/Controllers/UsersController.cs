@@ -22,7 +22,7 @@ namespace BottleStopAPI.Controllers
             _context = context;
         }
 
-        /// <summary>
+         /// <summary>
         ///     Return favorite based on favorite id
         /// </summary>
         /// <param name="id"></param>
@@ -63,7 +63,7 @@ namespace BottleStopAPI.Controllers
             return bottleUser;
         }
 
-        /// IGNOR THIS!
+        /// IGNORE THIS!
         /// <summary>
         ///     Return users favorite beverages avaliable in machine.
         /// </summary>
