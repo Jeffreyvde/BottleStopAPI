@@ -23,21 +23,21 @@ namespace BottleStopAPI.Controllers
         }
 
          /// <summary>
-        ///     Return favorite based on favorite id
+        ///     Return favorites based on favorite id
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
         [HttpGet("favorite/{id}")]
-        public async Task<ActionResult<IEnumerable<Favorite>>> GetFavorite(int id)
+        public async Task<ActionResult<IEnumerable<Favorite>>> GetFavorites(int id)
         {
-            List<Favorite> favorite = await _context.Favorite
+            List<Favorite> favorites = await _context.Favorite
                 .Where(i => i.FavoriteId == id)
                 .ToListAsync();
 
-            if (favorite == null)
+            if (favorites == null)
                 return NotFound();
 
-            return favorite;
+            return favorites;
         }
 
         /// <summary>
