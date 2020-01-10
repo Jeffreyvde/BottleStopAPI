@@ -45,6 +45,7 @@ namespace BottleStopAPI.Controllers
             return bottleUser;
         }
 
+        /// IGNOR THIS!
         /// <summary>
         ///     Return users favorite beverages avaliable in machine.
         /// </summary>
@@ -53,17 +54,9 @@ namespace BottleStopAPI.Controllers
         [HttpGet("favorite/{uid}/{machine}")]
         public async Task<ActionResult<IEnumerable<Beverage>>> GetUserFavoriteBeverageFromMachine(int uid, string machine)
         {
-            //var test = _context.Machine
-            //    .Single(m => m.MachineId == machine);
-            
-            //var asd = _context.Entry(test)
-            //    .Collection(b => b.)
-            //    .Query()
-            //    .Count();
             List <Beverage> beverage = await _context.Beverage
                 .Include(f => f.Favorite)
                     .ThenInclude(u => u.User)
-                    .Where()
                 .Include(ma => ma.MachineAvailability)
                 .ToListAsync();
 
