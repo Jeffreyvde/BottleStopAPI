@@ -23,6 +23,24 @@ namespace BottleStopAPI.Controllers
         }
 
         /// <summary>
+        ///     Return favorite based on favorite id
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [HttpGet("favorite/{id}")]
+        public async Task<ActionResult<IEnumerable<Favorite>>> GetFavorite(int id)
+        {
+            List<Favorite> favorite = await _context.Favorite
+                .Where(i => i.FavoriteId == id)
+                .ToListAsync();
+
+            if (favorite == null)
+                return NotFound();
+
+            return favorite;
+        }
+
+        /// <summary>
         ///     Returns the username, user id, bottle size and balance based on bottle. 
         /// </summary>
         /// <param name="id"></param>
@@ -64,24 +82,6 @@ namespace BottleStopAPI.Controllers
                 return NotFound();
 
             return beverage;
-        }
-
-        /// <summary>
-        ///     Return favorite based on favorite id
-        /// </summary>
-        /// <param name="id"></param>
-        /// <returns></returns>
-        [HttpGet("favorite/{id}")]
-        public async Task<ActionResult<IEnumerable<Favorite>>> GetFavorite(int id)
-        {
-            List<Favorite> favorite = await _context.Favorite
-                .Where(i => i.FavoriteId == id)
-                .ToListAsync();
-
-            if (favorite == null)
-                return NotFound();
-
-            return favorite;
         }
 
         /// <summary>
