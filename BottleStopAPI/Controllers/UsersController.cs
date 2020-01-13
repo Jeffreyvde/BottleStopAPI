@@ -63,25 +63,20 @@ namespace BottleStopAPI.Controllers
             return bottleUser;
         }
 
-        /// IGNORE THIS!
         /// <summary>
         ///     Return users favorite beverages avaliable in machine.
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        [HttpGet("favorite/{uid}/{machine}")]
-        public async Task<ActionResult<IEnumerable<Beverage>>> GetUserFavoriteBeverageFromMachine(int uid, string machine)
+        [HttpGet("")]
+        public async Task<ActionResult<IEnumerable<Beverage>>> getAllBeverages()
         {
-            List <Beverage> beverage = await _context.Beverage
-                .Include(f => f.Favorite)
-                    .ThenInclude(u => u.User)
-                .Include(ma => ma.MachineAvailability)
-                .ToListAsync();
+            List <Beverage> beverages = await _context.Beverage.ToListAsync();
 
-            if (beverage == null)
+            if (beverages == null)
                 return NotFound();
 
-            return beverage;
+            return beverages;
         }
 
         /// <summary>
@@ -97,7 +92,7 @@ namespace BottleStopAPI.Controllers
             _context.Favorite.Add(favorite);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction(nameof(GetFavorite), new { id = favorite.FavoriteId }, favorite);
+            return CreatedAtAction(nameof(GetFavorites), new { id = favorite.FavoriteId }, favorite);
         }
 
         /// <summary>
