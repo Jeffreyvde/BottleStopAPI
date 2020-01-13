@@ -64,22 +64,6 @@ namespace BottleStopAPI.Controllers
         }
 
         /// <summary>
-        ///     Return users favorite beverages avaliable in machine.
-        /// </summary>
-        /// <param name="id"></param>
-        /// <returns></returns>
-        [HttpGet("")]
-        public async Task<ActionResult<IEnumerable<Beverage>>> getAllBeverages()
-        {
-            List <Beverage> beverages = await _context.Beverage.ToListAsync();
-
-            if (beverages == null)
-                return NotFound();
-
-            return beverages;
-        }
-
-        /// <summary>
         ///     Add users favorite beverage
         /// </summary>
         /// <param name="favorite"></param>

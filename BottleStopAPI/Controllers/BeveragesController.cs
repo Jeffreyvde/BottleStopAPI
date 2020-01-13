@@ -34,11 +34,10 @@ namespace BottleStopAPI.Controllers
         }
 
         // GET: api/Beverages/{machine_id}
-        // Return all available beverages in machine
         /// <summary>
-        /// Gets available beverages for a specific machine
+        ///     Gets available beverages for a specific machine
         /// </summary>
-        /// <param name="id"></param>
+        /// <param name="'machine_id"></param>
         /// <returns></returns>
         [HttpGet("available/{machine_id}")]
         public async Task<ActionResult<IEnumerable<MachineAvailability>>> GetBeverageAvailability(string machine_id)
