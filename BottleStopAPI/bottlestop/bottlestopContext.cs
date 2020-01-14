@@ -40,6 +40,15 @@ namespace BottleStopAPI.BottleStop
         public virtual DbSet<User> User { get; set; }
         public virtual DbSet<UserBottle> UserBottle { get; set; }
 
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        {
+            if (!optionsBuilder.IsConfigured)
+            {
+#warning To protect potentially sensitive information in your connection string, you should move it out of source code. See http://go.microsoft.com/fwlink/?LinkId=723263 for guidance on storing connection strings.
+                optionsBuilder.UseMySql("server=bottle-stop-database.mysql.database.azure.com;port=3306;user=BottleStopAdmin@bottle-stop-database;password=Rx4NK8x*nQc*;database=BottleStop", x => x.ServerVersion("8.0.15-mysql"));
+            }
+        }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<Address>(entity =>
@@ -695,6 +704,10 @@ namespace BottleStopAPI.BottleStop
 
                 entity.Property(e => e.PumpId)
                     .HasColumnName("pump_id")
+                    .HasColumnType("int(11)");
+
+                entity.Property(e => e.Flowrate)
+                    .HasColumnName("flowrate")
                     .HasColumnType("int(11)");
 
                 entity.Property(e => e.IngredientId)
