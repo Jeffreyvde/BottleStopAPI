@@ -97,7 +97,7 @@ namespace BottleStopAPI.Controllers
             _context.Favorite.Add(favorite);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction(nameof(GetFavorite), new { id = favorite.FavoriteId }, favorite);
+            return CreatedAtAction(nameof(GetFavorites), new { id = favorite.FavoriteId }, favorite);
         }
 
         /// <summary>
