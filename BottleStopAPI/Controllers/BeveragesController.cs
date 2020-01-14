@@ -33,7 +33,6 @@ namespace BottleStopAPI.Controllers
             return beverages;
         }
 
-        // GET: api/Beverages/{machine_id}
         /// <summary>
         ///     Gets available beverages for a specific machine
         /// </summary>
@@ -55,7 +54,6 @@ namespace BottleStopAPI.Controllers
             return machineAvailability;
         }
 
-
         // GET: api/Beverages/5
         [HttpGet("{id}")]
         public async Task<ActionResult<Beverage>> GetBeverage(int id)
@@ -69,7 +67,6 @@ namespace BottleStopAPI.Controllers
 
             return beverage;
         }
-
 
         // GET: beverage/beverage ID/recipe
         /// <summary>
