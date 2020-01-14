@@ -23,7 +23,7 @@ namespace BottleStopAPI.Controllers
         }
 
         /// <summary>
-        ///     Checks if bavarage is set to favorite for specific user 
+        ///     Checks if bavarage is set to favorite for specific user.
         /// </summary>
         /// <param name="uid"></param>
         /// <param name="bid"></param>
