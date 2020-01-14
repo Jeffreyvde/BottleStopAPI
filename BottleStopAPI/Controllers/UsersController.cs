@@ -22,7 +22,6 @@ namespace BottleStopAPI.Controllers
             _context = context;
         }
 
-
         /// <summary>
         ///     Checks if bevarage is set to favorite for specific user
         /// </summary>
