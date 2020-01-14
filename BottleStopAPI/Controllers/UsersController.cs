@@ -22,25 +22,18 @@ namespace BottleStopAPI.Controllers
             _context = context;
         }
 
-        // /{user_id}/{beverage_id}
-        // reutrn bool 
-        // Check if beverage is set to favorite for specific user
-        //  
-        //select* from favorite
-        //where user_id = 1
-        //AND beverage_id = 1
-
         /// <summary>
         ///     Checks if bavarage is set to favorite for specific user 
         /// </summary>
-        /// <param name="id"></param>
+        /// <param name="uid"></param>
+        /// <param name="bid"></param>
         /// <returns></returns>
         [HttpGet("favorite/{uid}/{bid}")]
-        public async Task<ActionResult<IEnumerable<Favorite>>> GetBaverageStatus(int uid, int bid)
+        public async Task<ActionResult<IEnumerable<Favorite>>> GetFavoriteStatus(int uid, int bid)
         {
             List<Favorite> favorites = await _context.Favorite
-                            .Where(i => i.UserId == uid && i.BeverageId == bid)
-                            .ToListAsync();
+                .Where(i => i.UserId == uid && i.BeverageId == bid)
+                .ToListAsync();
 
             if (favorites == null)
                 return NotFound();
