@@ -22,7 +22,26 @@ namespace BottleStopAPI.Controllers
             _context = context;
         }
 
-         /// <summary>
+        /// <summary>
+        ///     Checks if bevarage is set to favorite for specific user
+        /// </summary>
+        /// <param name="uid"></param>
+        /// <param name="bid"></param>
+        /// <returns></returns>
+        [HttpGet("favorite/{uid}/{bid}")]
+        public async Task<ActionResult<IEnumerable<Favorite>>> GetFavoriteStatus(int uid, int bid)
+        {
+            List<Favorite> favorites = await _context.Favorite
+                .Where(i => i.UserId == uid && i.BeverageId == bid)
+                .ToListAsync();
+
+            if (favorites == null)
+                return NotFound();
+
+            return favorites;
+        }
+
+        /// <summary>
         ///     Return favorites based on favorite id
         /// </summary>
         /// <param name="id"></param>
@@ -61,27 +80,6 @@ namespace BottleStopAPI.Controllers
             bottleUser.User.Password = null;
 
             return bottleUser;
-        }
-
-        /// IGNORE THIS!
-        /// <summary>
-        ///     Return users favorite beverages avaliable in machine.
-        /// </summary>
-        /// <param name="id"></param>
-        /// <returns></returns>
-        [HttpGet("favorite/{uid}/{machine}")]
-        public async Task<ActionResult<IEnumerable<Beverage>>> GetUserFavoriteBeverageFromMachine(int uid, string machine)
-        {
-            List <Beverage> beverage = await _context.Beverage
-                .Include(f => f.Favorite)
-                    .ThenInclude(u => u.User)
-                .Include(ma => ma.MachineAvailability)
-                .ToListAsync();
-
-            if (beverage == null)
-                return NotFound();
-
-            return beverage;
         }
 
         /// <summary>

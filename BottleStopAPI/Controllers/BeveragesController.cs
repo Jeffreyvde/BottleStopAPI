@@ -25,7 +25,33 @@ namespace BottleStopAPI.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Beverage>>> GetBeverage()
         {
-            return await _context.Beverage.ToListAsync();
+            List<Beverage> beverages = await _context.Beverage.ToListAsync();
+
+            if (beverages == null)
+                return NotFound();
+
+            return beverages;
+        }
+
+        /// <summary>
+        ///     Gets available beverages for a specific machine
+        /// </summary>
+        /// <param name="'machine_id"></param>
+        /// <returns></returns>
+        [HttpGet("available/{machine_id}")]
+        public async Task<ActionResult<IEnumerable<MachineAvailability>>> GetBeverageAvailability(string machine_id)
+        {
+            List <MachineAvailability> machineAvailability = await _context.MachineAvailability
+                .Where(id => id.MachineId == machine_id)
+                .Include(b => b.Beverage)             
+                .ToListAsync();
+                
+            if (machineAvailability == null)
+            {
+                return NotFound();
+            }
+
+            return machineAvailability;
         }
 
         // GET: api/Beverages/5
@@ -39,10 +65,8 @@ namespace BottleStopAPI.Controllers
                 return NotFound();
             }
 
-
             return beverage;
         }
-
 
         // GET: beverage/beverage ID/recipe
         /// <summary>
@@ -55,7 +79,6 @@ namespace BottleStopAPI.Controllers
         {
             IQueryable<Recipe> beverages = _context.Recipe.Where(m => m.BeverageId == id)
             .Include(m => m.Ingredient);
-
 
             return beverages.ToArray();
         }
