@@ -697,6 +697,10 @@ namespace BottleStopAPI.BottleStop
                     .HasColumnName("pump_id")
                     .HasColumnType("int(11)");
 
+                entity.Property(e => e.Flowrate)
+                    .HasColumnName("flowrate")
+                    .HasColumnType("int(11)");
+
                 entity.Property(e => e.IngredientId)
                     .HasColumnName("ingredient_id")
                     .HasColumnType("int(11)");
